@@ -1,0 +1,32 @@
+# week12-5.py 學習計畫 Graph - DFS 第4題 Medium 題
+# LeetCode 399. Evaluate Division
+# 有很多分子、分母的除法的關係
+
+from collections import defaultdict
+
+class Solution:
+    def calcEquation(self, equations: List[List[str]], values: List[float], queries: List[List[str]]) -> List[float]:
+        path = defaultdict(list)
+        for (a, b), v in zip(equations, values): # 用拉鏈綁起來
+            path[a].append( (b, v) )   # 正著走：a/b = v
+            path[b].append( (a, 1/v) ) # 倒著走：b/a = 1/v
+
+        def helper(now, target, v0):
+            if now not in path or target not in path:
+                return -1.0 # 有怪物出現（沒見過的變數），不要再算了
+            if now == target:
+                return v0 # 找到目標了，回傳累積的數值
+
+            visited.add(now)
+            ans = -1.0
+            for node, v in path[now]:
+                if node not in visited: # 沒走過，就可走走看、試試看
+                    ans = max(ans, helper(node, target, v0 * v))
+            return ans
+
+        ans = []
+        for a, b in queries:
+            visited = set()
+            ans.append(helper(a, b, 1.0))
+
+        return ans
